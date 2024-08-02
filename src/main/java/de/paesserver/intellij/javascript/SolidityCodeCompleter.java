@@ -14,6 +14,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.PlatformIcons;
+import me.serce.solidity.lang.psi.impl.SolFunctionDefinitionImpl;
+import me.serce.solidity.lang.psi.impl.SolStateVariableDeclarationImpl;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.diagnostic.Logger;
 
@@ -120,20 +122,30 @@ public class SolidityCodeCompleter extends CompletionContributor {
                     continue;
                 }
                 if (node.getElementType().toString().equals("FUNCTION_DEFINITION")) {
+                    String text = psiFile.getName();
+
+                    if (functionOrVariable instanceof SolFunctionDefinitionImpl func){
+                        if (func.getReturns() != null){
+                            text = func.getReturns().getText();
+                        }
+                    }
                     resultSet.addElement(
                             LookupElementBuilder.create(name)
                                     .withIcon(PlatformIcons.METHOD_ICON)
-                                    .withTypeText(psiFile.getName(), true)
+                                    .withTypeText(text, true)
                     );
                 } else if (node.getElementType().toString().equals("STATE_VARIABLE_DECLARATION")) {
+                    String text = psiFile.getName();
+                    if (functionOrVariable instanceof SolStateVariableDeclarationImpl var){
+                        text = var.getTypeName().getText();
+                    }
                     resultSet.addElement(
                             LookupElementBuilder.create(name)
                                     .withIcon(PlatformIcons.VARIABLE_ICON)
-                                    .withTypeText(psiFile.getName(), true)
+                                    .withTypeText(text, true)
                     );
                 }
             }
-
         }
         return;
     }
@@ -308,6 +320,10 @@ public class SolidityCodeCompleter extends CompletionContributor {
                             }
                         }
                         //At this point we have the deploy or getfactory in our scope and we have the reference we have to look for
+                        if (deployExpression == null){
+                            LOG.debug("Deploy expression null");
+                            return null;
+                        }
                         return resolveDeployToContractFactory(deployExpression);
                     }
                 }
