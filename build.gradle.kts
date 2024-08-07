@@ -36,7 +36,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.14.0-rc1")
 
     intellijPlatform {
-        intellijIdeaUltimate("2024.1")
+        intellijIdeaUltimate("2024.2")
         bundledPlugins("JavaScript","com.intellij.java")
         plugin("me.serce.solidity:2.4.4")
 
